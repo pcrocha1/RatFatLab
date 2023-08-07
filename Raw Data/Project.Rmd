@@ -1,0 +1,101 @@
+---
+title: "Cocaine Withdrawal in Rats and Protein Expression"
+author: "PCR"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    fig_width: 10
+    fig_heigh: 6
+  pdf_document:
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(reshape2)
+library(ThemePark)
+```
+
+#Analysis of protein expression in rats experiencing cocaine withdrawal
+--Data gathered by Dr. Karen Szumkslki, BANG LAB
+--Research Assistants: Priscilla Cuellar-Rocha, Sandra 
+--Graduate Research Assistants: Fernando Cano, Lauren
+
+  Previous research has found that craving incubation can be tested by the amount of protein expression found in the brain. In both rat and human proteins are found throughout the brain. The types of proteins used in this study have been found to have a relationship with drug addiction craving. This report presents analysis for the data called rattyFatty gathered in the Bang Lab. 
+
+##Researh Question 
+
+  The data gathered are from rats who were given cocaine via a Skinner-based classical conditioned environment. Essentially these one group of rats were given cocaine if they clicked the right lever, and no cocaine if they clicked the left button. The second group of rats were put in the same situation however instead of being give cocaine when pushing the right lever they would only get a bright signal. Both groups of rats would then either be placed in 3 day withdrawal period or in a 30 day withdrawal period. 
+  
+##Methods
+  A 2x2 Anova analysis was conducted. Independent variable (predictor variable) 1 will be if they are either given cocaine or a sham; Sham being the control group. Independent Variable 2 will be when given cocaine will the rat be placed in a 3 day or 30 day withdrawal. 
+ The Outcome variable will be protein expression: Glutamate1, mTOR, pAKT, Homer1, AKT, and Homer2. It wil be measured through a boxplot graph to determine  
+Cocaine | Control
+--------|--------
+30WD    | 1WD
+1WD     | 30WD
+
+The null hypothesis is that rats in a 30 day withdrawal (30WD) will exhibit higher craving inhibition rats than the 3 day withdrawal (3WD) rats. 
+
+◦ Describe your prediction(s) (~1-2
+sentences)
+◦ Show and explain your results
+◦ What tests did you run?
+◦ What do they mean?
+◦ How do they support or challenge your
+prediction(s)?
+
+```{r Loading}
+rattyFatty <- read.csv("Raw Data/Cocaine_PL.csv")
+colnames(rattyFatty)[5] ="Glutmate1"
+colnames(rattyFatty)[6] ="mTOR"
+colnames(rattyFatty)[7] ="pAKT"
+colnames(rattyFatty)[8] ="Homer1"
+colnames(rattyFatty)[9] ="AKT"
+colnames(rattyFatty)[10] ="Homer2"
+
+ratMelt <- melt(rattyFatty,
+                measure.vars=c("Glutmate1","mTOR", "pAKT", "Homer1", "AKT", "Homer2"),
+                  variable.name=c("protein"),
+                  value.name=c("expression"))
+                    
+
+ratMelt$WD <- factor(ratMelt$WD)
+ratMelt$Group <- factor(ratMelt$Group, labels = c("Cocaine", "Control"))
+```
+
+
+#Cocaine withdrawal and its Protein expression4
+```{r Data_Visualization}
+ratPlot <- ggplot(data=ratMelt, aes(x=WD, y=expression, fill=protein)) +
+  geom_boxplot() + facet_wrap(~Group) +
+  labs(x="Withdrawal Days", y="Protein Expression", fill = "Types of Proteins") +
+  theme_gray(base_size=30) +
+  theme_barbie() +  scale_color_zelda()
+  ggtitle("Craving Incubation Behavior in Rats")
+
+ratPlot
+```
+
+
+#Data Analysis in a 2x2 ANOVA 
+```{r ANOVA_Mixed}
+letsee <- aov(expression~WD*Group*protein+Error(Animal_ID),data=ratMelt)
+
+summary(letsee)
+```
+
+  The results found that between 3WD and 30WD a low F-value suggesting that when compared there a difference but the p-value suggest no significant difference between the groups. 
+  Protein expression does imply a significant relationship. However, when taking withdrawal days into consideration it does not seem that the length of days had a significant relationship to the the amount of proteins expressed. The p-value seemed to increase even more when both values, Group (cocaine and control), Withdrawal days were considered. 
+  We can then reject the null hypothesis. Although both independent variables had a high variance it does not seem that there relationship had an impact on protein expression.
+  
+  
+##Discussion
+  Although previous research has found that cocaine incubation does increase with longer days. The data found in this study that it suggests otherwise.
+  This difference could perhaps be the result of either 1) the cue-based animal design had an error that resulted in the rat not having a long enough incubation rate, or 2) the error occurred during the immuno-blotting phase. 
+
+  
+  
