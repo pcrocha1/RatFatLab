@@ -1,0 +1,116 @@
+---
+title: "Cocaine incubation and its effects on protein expression in male rats"
+author: "Priscilla Cuellar-Rocha"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+---
+title: "Cocaine Withdrawal in Rats and Protein Expression"
+author: "Priscilla Cuellar-Rocha"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    fig_width: 10
+    fig_heigh: 6
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r Loading}
+library(ggplot2)
+library(reshape2)
+library(ThemePark)
+library(readr)
+```
+
+# Analysis of protein expression in rats experiencing cocaine withdrawal
+- Data gathered by Dr. Karen Szumkslki, Behavioral and Neural Genetics (BANG) LAB
+- Principal Investigator: Karen Szumkslki 
+- Research Assistants: Priscilla Cuellar-Rocha
+- Graduate Research Assistants: Fernando Cano
+
+  Previous research has found that cue-elicited craving incubation can be tested from protein expression. Proteins are found all throughout the brain and the body. The types of proteins used in this study have been found to have a relationship with drug addiction craving. This report presents analysis for the data called rattyFatty gathered in the Bang Lab for rats that were given cocaine.  
+
+### Research Question 
+
+  The data gathered are from rats who were given cocaine via a Skinner-based operant conditioned environment. One group of rats were given cocaine while another different group of rats were control. During cue-testing the right lever press gives us those cues only. Every time they got that reward they got a tone/light cue. Which then became associated with the reward. Those cues developed a reinforcing properties. 
+  Both groups of rats would then either be placed in an early withdrawal (3 day) period or in a late withdrawal (30 day) period. 
+  
+### Methods
+ 
+  A 2x2 Anova analysis was conducted. The predictor variables will be if they are either given cocaine or a sham; Sham being the control group. The second predictor variable will be when given cocaine will the rat be placed in a 3 day or 30 day abstinence period. 
+  The Outcome variable will be protein expression: Glutamate1, mTOR, pAKT, Homer1, AKT, and Homer2. It will be measured through a boxplot graph to quantify the proteins. 
+  
+Cocaine | Control
+--------|--------
+30WD    | 1WD
+1WD     | 30WD
+
+```{r}
+rattyFatty <- read.csv("Raw Data/Cocaine_PL.csv")
+```
+
+
+```{r Loading}
+colnames(rattyFatty)[5] ="Glutmate1"
+colnames(rattyFatty)[6] ="mTOR"
+colnames(rattyFatty)[7] ="pAKT"
+colnames(rattyFatty)[8] ="Homer1"
+colnames(rattyFatty)[9] ="AKT"
+colnames(rattyFatty)[10] ="Homer2"
+
+ratMelt <- melt(rattyFatty,
+                measure.vars=c("Glutmate1","mTOR", "pAKT", "Homer1", "AKT", "Homer2"),
+                  variable.name=c("protein"),
+                  value.name=c("expression"))
+                    
+
+ratMelt$WD <- factor(ratMelt$WD)
+ratMelt$Group <- factor(ratMelt$Group, labels = c("Cocaine", "Control"))
+```
+
+
+### Predictions
+
+- The null hypothesis is that rats in a late withdrawal (30WD) will exhibit higher craving than the early withdrawal (3WD) rats as quantified by protein expression. 
+
+sentences)
+
+# Results
+### Cocaine withdrawal and its Protein expression on male rats Graph
+```{r Data_Visualization}
+ratPlot <- ggplot(data=ratMelt, 
+                  aes(x=WD, y=expression, fill=protein)) +
+  geom_boxplot() + facet_wrap(~Group) +
+  labs(x="Withdrawal Days", y="Protein Expression", fill = "Types of Proteins") +
+  theme_gray(base_size=20) +
+  theme_barbie() +
+  ggtitle("Craving Incubation Behavior in Rats")
+
+
+ratPlot
+```
+
+
+### Data Analysis in a 2x2 ANOVA 
+```{r ANOVA_Mixed}
+letsee <- aov(expression~WD*Group*protein+Error(Animal_ID),data=ratMelt)
+
+summary(letsee)
+```
+
+  The results found that protein expression had the lowest p>value, strongly implying a significant difference between the types of protein groups. However this difference does not indicate any relation to what we are trying to look for in the study.
+  A 3-way interaction (Withdrawal Days, Cocaine/Control, Different types of Proteins), was the second lowest p-value, which can indicate that there seems to be some type of significant relationship. However, this could be the result of the protein expression skewing the results.   
+  Overall this data does not support the predictions, we can then reject the null hypothesis. Although the predictor variables had a high variance it does not seem that there relationship had an impact on protein expression.
+  
+# Discussion
+  Although previous research has found that cocaine incubation does increase with longer days. The data found in this study that it suggests otherwise.
+  This difference could perhaps be the result of either 1) the cue-based animal design had an error that resulted in the rat not having a long enough incubation rate, or 2) the error occurred during the immunoblotting phase. 
